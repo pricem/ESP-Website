@@ -95,12 +95,20 @@ def ajax_login(request, *args, **kwargs):
     content = render_to_string('users/loginbox_content.html', RequestContext(request, {'request': request, 'login_result': result_str}))
     result_dict = {'loginbox_html': content}
     
+    result_dict['script'] = """
+        load_cookies();
+        update_user_classes();
+    """
     if request.user.isAdministrator():
         admin_home_url = Tag.getTag('admin_home_page')
         if admin_home_url:
-            result_dict['script'] = render_to_string('users/loginbox_redirect.js', {'target': admin_home_url})
+            result_dict['script'] += render_to_string('users/loginbox_redirect.js', {'target': admin_home_url})
 
-    return HttpResponse(json.dumps(result_dict))
+    response = HttpResponse(json.dumps(result_dict))
+    if request.user and request.user.id > 0 and request.user.is_active:
+        response._new_user = request.user
+
+    return response
 
 def signed_out_message(request):
     if request.user.is_authenticated():
