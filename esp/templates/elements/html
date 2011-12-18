@@ -41,6 +41,7 @@
     $j(document).ready(function() {
         $j.getScript("/media/scripts/csrf_init.js");
         $j.getScript("/media/scripts/csrf_check.js");
+        load_cookies();
         update_user_classes();
     });
     </script>
