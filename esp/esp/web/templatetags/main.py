@@ -46,8 +46,9 @@ def bool_or(obj1,obj2):
 def bool_and(obj1,obj2):
     #print str(obj1) + " and " + str(obj2) + " --> " + str(obj1 and obj2)
     return obj1 and obj2
-#theme would serve as a default template scheme
-theme = {
+    
+#   The default (MIT ESP) template scheme
+default_theme = {
     '': 'yellowgreen',
     'Splash': 'blue',
     'Spark': 'purple',
@@ -64,18 +65,23 @@ theme = {
 #provide a {{ '{ "":"color1","Splash":"color2","Spark":"color3"}'|get_colors}} in the template override 
 @register.filter
 def get_colors(json_str):
+    theme = {}
     try:
         json_arr=json.loads(json_str)
         for i in json_arr.keys():
             theme[i]=str(json_arr[i])
     except:
         pass
+    return theme
     
 @register.filter
-def extract_theme(str):
+def extract_theme(str, theme_desc=None):
+    if theme_desc is None:
+        theme = default_theme
+    else:
+        theme = get_colors(theme_desc)
     str = (str + '//').split('/')
-    return theme.get(str[2],False) or theme.get(str[1],False) or 'yellowgreen'
-
+    return theme.get(str[2], False) or theme.get(str[1], False) or theme.get('', False)
 
 @register.filter
 def truncatewords_char(value, arg):
